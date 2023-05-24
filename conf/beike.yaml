@@ -1,0 +1,3 @@
+name: beike
+json:
+  url: https://m.ke.com/liverpool/api/ershoufang/getList?cityId=120000&condition=hexi
