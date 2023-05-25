@@ -1,9 +1,10 @@
 package app
 
 import (
-	"encoding/json"
 	"net/http"
 	"regexp"
+
+	"fang/core"
 )
 
 var (
@@ -34,25 +35,61 @@ func (c *CollectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CollectHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var t []string
-	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		internalServerError(w, r)
-		return
-	}
-
-	// h.store.Lock()
-	// h.store.m[u.ID] = u
-	// h.store.Unlock()
-	// jsonBytes, err := json.Marshal(t)
+	// req, err := ioutil.ReadAll(r.Body)
 	// if err != nil {
 	// 	internalServerError(w, r)
 	// 	return
 	// }
-	// w.WriteHeader(http.StatusOK)
+
+	// var ts []core.Task
+	// // h.store.Lock()
+	// // h.store.m[u.ID] = u
+	// // h.store.Unlock()
+	// if err := json.Unmarshal(req, &ts); err != nil {
+	// 	internalServerError(w, r)
+	// 	return
+	// }
+
+	yml := core.YamlConfig[[]core.Task]{}
+	ts, err := yml.ReadAll(r.Body)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+
+	core.CreateJobs(ts)
+	w.WriteHeader(http.StatusOK)
 	// w.Write(jsonBytes)
+	// json.NewEncoder(w).Encode(req)
 }
 
-func (c *CollectHandler) Delete(w http.ResponseWriter, r *http.Request) {}
+func (c *CollectHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	// req, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	internalServerError(w, r)
+	// 	return
+	// }
+
+	// var ts []core.Task
+	// if err := json.Unmarshal(req, &ts); err != nil {
+	// 	internalServerError(w, r)
+	// 	return
+	// }
+
+	yml := core.YamlConfig[[]core.Task]{}
+	ts, err := yml.ReadAll(r.Body)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+
+	var names []string
+	for _, t := range ts {
+		names = append(names, t.Name)
+	}
+	core.DeleteJobs(names...)
+	w.WriteHeader(http.StatusOK)
+}
 
 func internalServerError(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)

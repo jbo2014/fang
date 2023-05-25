@@ -3,12 +3,25 @@ package client
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
-var f = flag.String("f", "", "Yaml文件路径")
+var add = flag.NewFlagSet("add", flag.ExitOnError)
+var addFile = add.String("f", "", "Yaml文件路径")
+var del = flag.NewFlagSet("del", flag.ExitOnError)
+var delFile = del.String("f", "", "Yaml文件路径")
 
 func main() {
-	flag.Parse()
-	fmt.Println("-f", *f)
-	fmt.Println("其他参数", flag.Args())
+	if len(os.Args) < 1 {
+		fmt.Println("expected subcommands")
+		os.Exit(1)
+	}
+
+	switch os.Args[1] {
+	case "add":
+
+	case "del":
+	default:
+		fmt.Println("unknown subcommands")
+	}
 }
